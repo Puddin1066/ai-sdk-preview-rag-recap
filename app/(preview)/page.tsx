@@ -14,14 +14,17 @@ import { toast } from "sonner";
 
 export default function Chat() {
   const [toolCall, setToolCall] = useState<string>();
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
     useChat({
-      maxSteps: 4,
-      onToolCall({ toolCall }) {
-        setToolCall(toolCall.toolName);
+      api: "/api/chat",
+      onResponse: (response) => {
+        if (!response.ok) {
+          throw new Error('Failed to get response from server');
+        }
       },
       onError: (error) => {
-        toast.error("You've been rate limited, please try again later!");
+        console.error('Chat error:', error);
+        toast.error("Failed to get response. Please try again.");
       },
     });
 
